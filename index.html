@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>InstaVeritas Diwali Tambola</title>
+<meta name="theme-color" content="#061727">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎟️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Ubuntu+Condensed&family=Yatra+One&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#061727; --bg-1:#0a2840; --bg-2:#0d3550; --bg-3:#12456a;
+  --gold:#ffcf5a; --gold-2:#f5a524; --cream:#fff3dc; --cream-2:#fde9c4; --maroon:#5c1430;
+  --saffron:#ff8a1f; --pink:#e8407f; --muted:#a9bccd; --line:rgba(255,207,90,.22); --panel:rgba(255,255,255,.045);
+  --iv-blue:#1d5fa8; --ok:#2ec48a; --no:#ff6b6b;
+  --f-body:'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --f-display:'Yatra One', 'Poppins', Georgia, serif;
+  --f-logo:'Ubuntu Condensed', 'Arial Narrow', sans-serif;
+  color-scheme:dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top, 0px);
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg-0:#061727; --cream:#fff3dc; } }
+:root[data-theme="dark"]{ --bg-0:#061727; --cream:#fff3dc; }
+html{ scroll-padding-top:env(safe-area-inset-top, 0px); }
+*,*::before,*::after{ box-sizing:inherit; }
+html,body{ margin:0; height:100%; }
+body{ color:var(--cream); font-family:var(--f-body); -webkit-font-smoothing:antialiased;
+  background:radial-gradient(120% 90% at 50% 0%, var(--bg-3) 0%, var(--bg-2) 30%, var(--bg-1) 62%, var(--bg-0) 100%) fixed, var(--bg-0); }
+button,input,select,textarea{ font:inherit; color:inherit; }
+:focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+.sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.stars{ position:fixed; inset:0; pointer-events:none; z-index:0; }
+.stars i{ position:absolute; border-radius:50%; background:#fff; opacity:.5; animation:tw var(--t) ease-in-out infinite; animation-delay:var(--d); }
+@keyframes tw{ 0%,100%{opacity:.15} 50%{opacity:.8} }
+#fx{ position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:40; }
+
+/* ---------- layout ---------- */
+.app{ position:relative; z-index:1; height:100%; display:grid; grid-template-rows:auto auto 1fr; }
+.toran{ height:34px; background-repeat:repeat-x; background-size:auto 34px; background-position:center top; filter:drop-shadow(0 3px 4px rgba(0,0,0,.35)); }
+header.top{ display:flex; align-items:center; gap:18px; padding:4px clamp(14px,2.4vw,32px) 10px; flex-wrap:wrap; }
+.plate{ display:inline-flex; align-items:center; padding:8px 16px; border-radius:14px; background:linear-gradient(180deg,#fffcf4,var(--cream-2)); box-shadow:0 0 0 2px var(--gold), 0 8px 20px rgba(0,0,0,.35); }
+.logo{ display:inline-flex; align-items:center; gap:7px; height:var(--lh); color:var(--iv-blue); }
+.logo .lm{ height:100%; width:auto; overflow:visible; }
+.logo .wm{ font:400 calc(var(--lh) * .7)/1 var(--f-logo); }
+.spk{ transform-box:fill-box; transform-origin:center; animation:spk .55s ease-in-out infinite alternate; }
+.spk2{ transform-box:fill-box; transform-origin:center; animation:spin 2.4s linear infinite; }
+@keyframes spk{ from{ transform:scale(.65); opacity:.75 } to{ transform:scale(1.25) rotate(25deg); opacity:1 } }
+@keyframes spin{ to{ transform:rotate(360deg) } }
+.brand-title{ margin:0; font:400 clamp(28px,3.2vw,44px)/1 var(--f-display);
+  background:linear-gradient(180deg,#fff6cf,#ffd166 45%,#ff9f1c); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.tally{ margin-left:auto; font:600 15px/1.3 var(--f-body); color:var(--muted); text-align:right; }
+.tally b{ color:var(--gold); font-size:22px; }
+.top-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+.btn{ border:1.5px solid rgba(255,207,90,.5); background:rgba(255,255,255,.05); color:var(--cream); border-radius:12px;
+  padding:9px 14px; font-weight:600; font-size:14.5px; cursor:pointer; transition:background .15s, transform .1s; }
+.btn:hover{ background:rgba(255,207,90,.12); }
+.btn:active{ transform:translateY(1px); }
+.btn:disabled{ opacity:.4; cursor:not-allowed; }
+.btn.on{ background:rgba(255,207,90,.2); border-color:var(--gold); color:#fff; }
+.btn.warn{ border-color:rgba(255,107,107,.55); }
+.btn.warn.armed{ background:#b3263d; border-color:#ff8a8a; color:#fff; }
+
+main{ min-height:0; display:grid; grid-template-columns:minmax(330px,400px) 1fr; gap:clamp(14px,2vw,28px); padding:0 clamp(14px,2.4vw,32px) clamp(14px,2vw,24px); }
+aside{ min-height:0; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-right:4px; }
+.panel{ background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:16px; }
+
+/* ---------- the caller (rangoli drum) ---------- */
+.caller{ display:flex; flex-direction:column; align-items:center; padding:18px 16px 16px; }
+.drum{ position:relative; width:min(290px,72vw); aspect-ratio:1; }
+.drum svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; filter:drop-shadow(0 0 30px rgba(255,160,60,.25)); }
+.petals{ transform-box:fill-box; transform-origin:center; animation:spin 90s linear infinite; }
+.rolling .petals{ animation-duration:1.1s; }
+.num{ position:absolute; inset:0; display:grid; place-items:center; font:800 clamp(64px,8.4vw,92px)/1 var(--f-body); color:var(--maroon); font-variant-numeric:tabular-nums; }
+.num.empty{ font:400 26px/1.2 var(--f-display); color:#b0602a; text-align:center; }
+.num.reveal{ animation:reveal .6s cubic-bezier(.2,1.6,.4,1); }
+.rolling .num{ color:#b0602a; opacity:.75; }
+@keyframes reveal{ from{ transform:scale(.4); opacity:0 } to{ transform:none; opacity:1 } }
+.call-name{ min-height:2.6em; margin:12px 0 0; text-align:center; font:600 italic 19px/1.3 var(--f-body); color:var(--gold); }
+.prev{ display:flex; align-items:center; gap:12px; margin-top:6px; }
+.prev span.lbl{ font:600 14px var(--f-body); color:var(--muted); }
+.chip{ width:52px; height:52px; border-radius:50%; display:grid; place-items:center; font:800 21px/1 var(--f-body);
+  background:rgba(255,207,90,.1); border:2px solid rgba(255,207,90,.6); color:var(--cream); font-variant-numeric:tabular-nums; }
+.chip:first-of-type{ background:rgba(255,207,90,.22); }
+.chip.blank{ border-style:dashed; color:transparent; background:none; }
+.call-btn{ margin-top:16px; width:100%; border:0; border-radius:18px; padding:18px; cursor:pointer;
+  font:800 24px/1 var(--f-body); color:#fff; background:linear-gradient(135deg,#ff8a1f,#e8407f);
+  box-shadow:0 10px 26px rgba(232,64,127,.38), inset 0 -4px 0 rgba(0,0,0,.18); transition:transform .1s, filter .15s; }
+.call-btn:hover{ filter:brightness(1.07); }
+.call-btn:active{ transform:translateY(2px); }
+.call-btn:disabled{ background:#5d6d7c; box-shadow:none; cursor:not-allowed; }
+.call-row{ display:flex; gap:8px; margin-top:10px; width:100%; }
+.call-row .btn{ flex:1; padding:9px 8px; font-size:14px; }
+.call-row select{ flex:0 0 auto; border-radius:12px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,207,90,.5); padding:0 8px; }
+.call-row select option{ background:var(--bg-1); }
+.hint{ margin:10px 0 0; font:500 12.5px/1.4 var(--f-body); color:var(--muted); text-align:center; }
+kbd{ font:600 12px var(--f-body); border:1px solid var(--line); border-radius:5px; padding:1px 5px; }
+
+/* ---------- prizes ---------- */
+.prizes h2{ margin:0 0 10px; font:400 24px/1.1 var(--f-display); color:var(--gold); }
+.prize{ display:grid; grid-template-columns:1fr auto; gap:6px 8px; align-items:center; padding:9px 0; border-top:1px solid rgba(255,207,90,.12); }
+.prize:first-of-type{ border-top:0; }
+.prize .pname{ font:700 15px var(--f-body); }
+.prize .pdesc{ grid-column:1 / -1; margin-top:-4px; font:500 12px var(--f-body); color:var(--muted); }
+.prize input{ grid-column:1; grid-row:3; min-width:0; background:rgba(255,255,255,.06); border:1px solid rgba(255,207,90,.3); border-radius:10px; padding:7px 10px; font-size:14px; }
+.prize input::placeholder{ color:#7f93a6; }
+.prize .pname{ grid-column:1 / -1; grid-row:1; }
+.prize .pdesc{ grid-row:2; }
+.prize .claim{ grid-column:2; grid-row:3; }
+.result .ticket{ max-width:600px; }
+.prize.won .pname::after{ content:" 🏆"; }
+.prize.won input{ border-color:var(--gold); background:rgba(255,207,90,.14); font-weight:600; }
+
+/* ---------- the board ---------- */
+.board-wrap{ min-height:0; container-type:size; display:grid; place-items:center; }
+.board{ width:min(100cqw, 100cqh * 1.62); aspect-ratio:1.62; container-type:inline-size; display:grid;
+  grid-template-columns:repeat(10,1fr); grid-template-rows:repeat(9,1fr); gap:clamp(4px,.6cqi,9px);
+  padding:clamp(8px,1.1cqi,16px); border-radius:24px; background:rgba(4,16,30,.45); border:1px solid var(--line);
+  box-shadow:inset 0 0 60px rgba(0,0,0,.35); }
+.cell{ position:relative; display:grid; place-items:center; border-radius:clamp(6px,.9cqi,12px);
+  background:rgba(255,255,255,.035); border:1px solid rgba(255,207,90,.14); color:rgba(255,243,220,.32);
+  font:700 4.1cqi/1 var(--f-body); font-variant-numeric:tabular-nums; transition:background .4s, color .4s, box-shadow .4s; }
+.cell.called{ background:linear-gradient(180deg,#ffe08a,#f5a524); color:var(--maroon); border-color:#ffe7a8;
+  box-shadow:0 0 14px rgba(255,170,50,.45), inset 0 -3px 0 rgba(120,40,0,.18); }
+.cell.latest{ background:linear-gradient(160deg,#ff8a1f,#e8407f); color:#fff; border-color:#fff; z-index:1;
+  box-shadow:0 0 0 3px rgba(255,255,255,.85), 0 0 28px rgba(255,120,60,.9); animation:latest 1.6s ease-in-out infinite; }
+@keyframes latest{ 0%,100%{ transform:scale(1.04) } 50%{ transform:scale(1.1) } }
+.cell.flash{ animation:flashc .45s ease-out; }
+@keyframes flashc{ from{ background:#fff; } }
+.done-banner{ display:none; }
+
+/* ---------- modals ---------- */
+.modal{ position:fixed; inset:0; z-index:30; display:grid; place-items:center; padding:16px; background:rgba(3,10,20,.72); }
+.modal[hidden]{ display:none; }
+.sheet{ position:relative; width:min(920px,100%); max-height:min(88dvh,900px); overflow:auto; border-radius:24px; padding:22px clamp(16px,3vw,30px) 26px;
+  background:linear-gradient(180deg,#0f3a59,#0a2840); border:1.5px solid var(--line); box-shadow:0 30px 80px rgba(0,0,0,.6); }
+.sheet h2{ margin:0 40px 6px 0; font:400 32px/1.1 var(--f-display); color:var(--gold); }
+.sheet p.lead{ margin:0 0 16px; max-width:62ch; color:var(--muted); font-size:14.5px; line-height:1.5; }
+.x{ position:absolute; top:14px; right:14px; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:rgba(255,255,255,.06); cursor:pointer; font-size:20px; line-height:1; }
+.toolbar{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:16px; }
+.toolbar label{ font-weight:600; font-size:14px; color:var(--muted); }
+.toolbar select,.toolbar input{ background:rgba(255,255,255,.07); border:1.5px solid rgba(255,207,90,.4); border-radius:10px; padding:8px 10px; }
+.toolbar select option{ background:var(--bg-1); }
+.set-code{ font:800 16px var(--f-body); color:var(--gold); letter-spacing:.06em; }
+.tickets{ display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:14px; }
+.ticket{ background:#fffaf0; color:var(--maroon); border-radius:12px; padding:8px 10px 10px; border:2px solid #e6a83a; break-inside:avoid; }
+.ticket .th{ display:flex; justify-content:space-between; align-items:baseline; font:700 12.5px var(--f-body); margin-bottom:6px; }
+.ticket .th .tn{ font:800 15px var(--f-body); color:#b8431b; }
+.tgrid{ display:grid; grid-template-columns:repeat(9,1fr); gap:3px; }
+.tgrid span{ aspect-ratio:1.05; display:grid; place-items:center; border-radius:5px; font:800 17px/1 var(--f-body); background:#fff; border:1.5px solid #efd3a0; }
+.tgrid span.e{ background:repeating-linear-gradient(45deg,#fbe8c4 0 4px,#fff3dc 4px 8px); border-color:#f3dcb0; }
+.tgrid span.hit{ background:#f5a524; color:#fff; border-color:#d98a10; }
+.tgrid span.miss{ background:#fff; }
+.tabs{ display:flex; gap:8px; margin-bottom:14px; }
+.result{ margin-top:14px; }
+.badges{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.badge{ padding:7px 12px; border-radius:999px; font:700 13.5px var(--f-body); border:1.5px solid rgba(255,255,255,.2); color:var(--muted); }
+.badge.yes{ background:rgba(46,196,138,.18); border-color:var(--ok); color:#bff5df; }
+.verdict{ margin:12px 0 0; font:700 17px/1.4 var(--f-body); }
+.verdict.good{ color:#9ff0cf; } .verdict.bad{ color:#ffb3b3; }
+textarea{ width:100%; min-height:90px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,207,90,.4); border-radius:12px; padding:10px 12px; resize:vertical; }
+.numlist{ display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+.numlist span{ min-width:40px; padding:6px 8px; border-radius:9px; text-align:center; font:700 15px var(--f-body); }
+.numlist .y{ background:#f5a524; color:var(--maroon); } .numlist .n{ background:rgba(255,107,107,.18); color:#ffc9c9; border:1px solid rgba(255,107,107,.5); }
+.history{ display:flex; flex-wrap:wrap; gap:6px; }
+.history span{ padding:6px 8px; border-radius:9px; background:rgba(255,207,90,.12); border:1px solid rgba(255,207,90,.35); font:700 14px var(--f-body); }
+.history span small{ display:block; font:500 10px var(--f-body); color:var(--muted); text-align:center; }
+.toast{ position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom, 0px)); z-index:50; transform:translate(-50%,20px); opacity:0;
+  padding:14px 22px; border-radius:16px; background:#0f3a59; border:1.5px solid var(--gold); font:700 17px var(--f-body); box-shadow:0 14px 40px rgba(0,0,0,.5);
+  transition:opacity .3s, transform .3s; pointer-events:none; max-width:90vw; text-align:center; }
+.toast.show{ opacity:1; transform:translate(-50%,0); }
+#printSheet{ display:none; }
+
+@media (max-width: 980px){
+  html,body{ height:auto; }
+  .app{ height:auto; }
+  main{ grid-template-columns:1fr; }
+  aside{ display:contents; }
+  .caller{ order:1; } .board-wrap{ order:2; } #newGame{ order:3; }
+  .hint{ display:none; }
+  .board-wrap{ container-type:normal; }
+  .board{ width:100%; aspect-ratio:1.3; }
+  .cell{ font-size:4.6cqi; }
+  .tally{ margin-left:0; text-align:left; }
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+@media print{
+  @page{ size:A4; margin:10mm; }
+  body{ background:#fff !important; color:#000; }
+  body > *:not(#printSheet){ display:none !important; }
+  #printSheet{ display:block !important; }
+  #printSheet .tickets{ grid-template-columns:1fr 1fr; gap:8mm 6mm; }
+  #printSheet .ticket{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+</head>
+<body>
+<div class="stars" id="stars" aria-hidden="true"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<div class="app">
+  <div class="toran" id="toran" aria-hidden="true"></div>
+  <header class="top">
+    <span class="plate" data-logo="30"></span>
+    <h1 class="brand-title">Diwali Tambola</h1>
+    <div class="tally" aria-live="polite"><b id="countCalled">0</b> called, <span id="countLeft">90</span> left</div>
+    <div class="top-actions">
+      <button class="btn" id="openTickets" type="button">🎟️ Tickets</button>
+      <button class="btn" id="openCheck" type="button">✅ Check a claim</button>
+      <button class="btn" id="fsBtn" type="button">⛶ Fullscreen</button>
+    </div>
+  </header>
+
+  <main>
+    <aside>
+      <section class="panel caller" aria-label="Number caller">
+        <div class="drum" id="drum">
+          <div id="drumArt"></div>
+          <div class="num empty" id="bigNum" aria-live="assertive">Ready when you are</div>
+        </div>
+        <p class="call-name" id="callName">Press Call next to light the first number</p>
+        <div class="prev" aria-label="Previous three numbers"><span class="lbl">Previous 3</span><span class="chip blank" id="p1"></span><span class="chip blank" id="p2"></span><span class="chip blank" id="p3"></span></div>
+        <button class="call-btn" id="callBtn" type="button">🪔 Call next</button>
+        <div class="call-row">
+          <button class="btn" id="autoBtn" type="button" aria-pressed="false">▶ Auto call</button>
+          <select id="speed" aria-label="Auto call speed">
+            <option value="5">every 5 s</option><option value="8" selected>every 8 s</option><option value="12">every 12 s</option><option value="20">every 20 s</option>
+          </select>
+        </div>
+        <div class="call-row">
+          <button class="btn on" id="voiceBtn" type="button" aria-pressed="true">🔊 Voice on</button>
+          <button class="btn" id="undoBtn" type="button">↶ Undo last</button>
+        </div>
+        <p class="hint"><kbd>Space</kbd> calls the next number, <kbd>A</kbd> starts or pauses auto call</p>
+      </section>
+
+      <button class="btn warn" id="newGame" type="button">✨ New game (clear the board)</button>
+    </aside>
+
+    <section class="board-wrap" aria-label="Numbers 1 to 90">
+      <div class="board" id="board"></div>
+    </section>
+  </main>
+</div>
+
+<!-- Tickets -->
+<div class="modal" id="ticketsModal" hidden role="dialog" aria-modal="true" aria-labelledby="tkTitle">
+  <div class="sheet">
+    <button class="x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="tkTitle">Tambola tickets</h2>
+    <p class="lead">Every ticket follows the classic rules: 3 rows, 5 numbers in each row, and each column holds its own range (1–9, 10–19 … 80–90). Print them, or save as PDF and share on WhatsApp. Ticket numbers are tied to the set code, so you can check any claim later.</p>
+    <div class="toolbar">
+      <label for="tkCount">How many</label>
+      <select id="tkCount"><option>6</option><option>12</option><option selected>24</option><option>36</option><option>48</option><option>60</option><option>90</option></select>
+      <span>Set code <span class="set-code" id="setCode"></span></span>
+      <button class="btn warn" id="newSet" type="button">New ticket set</button>
+      <button class="btn on" id="printBtn" type="button">🖨️ Print or save PDF</button>
+    </div>
+    <div class="tickets" id="tkPreview"></div>
+  </div>
+</div>
+
+<!-- Check -->
+<div class="modal" id="checkModal" hidden role="dialog" aria-modal="true" aria-labelledby="ckTitle">
+  <div class="sheet">
+    <button class="x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="ckTitle">Check a claim</h2>
+    <div class="tabs" role="tablist">
+      <button class="btn on" type="button" role="tab" data-tab="byTicket" aria-selected="true">By ticket number</button>
+      <button class="btn" type="button" role="tab" data-tab="byNums" aria-selected="false">Type the numbers</button>
+      <button class="btn" type="button" role="tab" data-tab="byHist" aria-selected="false">Call history</button>
+    </div>
+    <div data-pane="byTicket">
+      <p class="lead">For tickets printed from this board. Enter the ticket number to see it marked against the numbers called so far.</p>
+      <div class="toolbar"><label for="ckId">Ticket no.</label><input id="ckId" type="number" min="1" max="999" inputmode="numeric" style="width:110px"><button class="btn on" id="ckGo" type="button">Check</button></div>
+      <div class="result" id="ckTicketResult"></div>
+    </div>
+    <div data-pane="byNums" hidden>
+      <p class="lead">For any ticket, including paper ones. Type the numbers of the line or ticket being claimed, separated by spaces or commas.</p>
+      <textarea id="ckNums" placeholder="e.g. 4 17 32 56 81"></textarea>
+      <div class="toolbar" style="margin-top:10px"><button class="btn on" id="ckNumsGo" type="button">Check these numbers</button></div>
+      <div class="result" id="ckNumsResult"></div>
+    </div>
+    <div data-pane="byHist" hidden>
+      <p class="lead">Every number in the order it was called.</p>
+      <div class="history" id="history"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+<div id="printSheet"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = a => a[(Math.random() * a.length) | 0];
+const TAU = Math.PI * 2;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const svgURL = s => `url("data:image/svg+xml,${encodeURIComponent(s)}")`;
+
+/* ---------- traditional calls, with a little Diwali in them ---------- */
+const CALLS = {
+  1:'Kelly’s eye', 2:'One little duck', 3:'Cup of tea', 4:'Knock at the door', 5:'Man alive', 6:'Half a dozen laddoos', 7:'Lucky seven', 8:'Garden gate', 9:'Doctor’s orders', 10:'A big fat hen',
+  11:'Legs eleven', 12:'One dozen diyas', 13:'Unlucky for some', 14:'Valentine’s day', 15:'Young and keen', 16:'Sweet sixteen', 17:'Dancing queen', 18:'Coming of age', 19:'Goodbye teens', 20:'One score',
+  21:'Key of the door', 22:'Two little ducks', 23:'You and me', 24:'Two dozen sweets', 25:'Duck and dive', 26:'Republic Day', 27:'Gateway to heaven', 28:'In a state', 29:'Rise and shine', 30:'Thirty, feeling flirty',
+  31:'Get up and run', 32:'Buckle my shoe', 33:'All the threes', 34:'Ask for more', 35:'Jump and jive', 36:'Three dozen rockets', 37:'More than eleven', 38:'Christmas cake', 39:'Steps', 40:'Naughty forty',
+  41:'Time for fun', 42:'Quit India', 43:'Down on your knees', 44:'All the fours', 45:'Halfway there', 46:'Up to tricks', 47:'Year of Independence', 48:'Four dozen kaju katli', 49:'Rise and shine', 50:'Half a century',
+  51:'Tweak of the thumb', 52:'Deck of cards', 53:'Stuck in a tree', 54:'Clean the floor', 55:'All the fives', 56:'Pick up sticks', 57:'Year of the revolt', 58:'Make them wait', 59:'Just retired', 60:'Five dozen',
+  61:'Baker’s bun', 62:'Turn the screw', 63:'Tickle me', 64:'Catch the chor', 65:'Stop work', 66:'Clickety click', 67:'Made in heaven', 68:'Saving grace', 69:'Ups and downs', 70:'Three score and ten',
+  71:'Bang on the drum', 72:'Six dozen', 73:'Under the tree', 74:'Candy store', 75:'Strive and strive', 76:'Trombones', 77:'Two little crutches', 78:'Heaven’s gate', 79:'One more time', 80:'Eight and blank',
+  81:'Stop and run', 82:'Straight on through', 83:'Time for tea', 84:'Seven dozen crackers', 85:'Staying alive', 86:'Between the sticks', 87:'Torquay in Devon', 88:'Two fat ladies', 89:'Nearly there', 90:'Top of the house'
+};
+const WORDS = ['zero','one','two','three','four','five','six','seven','eight','nine'];
+function spoken(n) {
+  const name = CALLS[n];
+  if (n < 10) return `${name}. Number ${n}.`;
+  return `${name}. ${WORDS[Math.floor(n / 10)]} and ${WORDS[n % 10]}, ${n}.`;
+}
+
+/* ---------- art ---------- */
+function petal(r0, len, w, a, fill) {
+  const r1 = r0 + len;
+  return `<path d="M0 ${-r0} C${w} ${-(r0 + len * .35)} ${w * .55} ${-(r1 - len * .1)} 0 ${-r1} C${-w * .55} ${-(r1 - len * .1)} ${-w} ${-(r0 + len * .35)} 0 ${-r0}Z" fill="${fill}" transform="rotate(${a.toFixed(2)})"/>`;
+}
+function ringOf(n, fn, off = 0) { let s = ''; for (let i = 0; i < n; i++) s += fn(off + i * 360 / n, i); return s; }
+function dotsRing(n, r, rad, fill, off = 0) { return ringOf(n, a => { const t = a * Math.PI / 180; return `<circle cx="${(Math.sin(t) * r).toFixed(2)}" cy="${(-Math.cos(t) * r).toFixed(2)}" r="${rad}" fill="${fill}"/>`; }, off); }
+function drumSVG() {
+  const O = '#f28a2e', O2 = '#f9a640', P = '#e0457b', C = '#fde3b0', G = '#f5b942';
+  return `<svg viewBox="-100 -100 200 200" aria-hidden="true">
+    <circle r="98" fill="none" stroke="${G}" stroke-opacity=".35" stroke-width=".7"/>
+    <g class="petals">
+      ${dotsRing(28, 93, 1.6, G, 6.4)}
+      ${ringOf(12, a => petal(56, 30, 13, a, O2), 15)}
+      ${ringOf(12, a => petal(60, 30, 15, a, O))}
+      ${ringOf(24, a => petal(63, 10, 4.2, a, P), 7.5)}
+      <circle r="58" fill="none" stroke="${G}" stroke-opacity=".55" stroke-width=".7" stroke-dasharray="1.5 2.5"/>
+      ${ringOf(12, a => petal(46, 14, 8, a, C), 15)}
+    </g>
+    <circle r="47" fill="#fff8ec" stroke="${G}" stroke-width="3.4"/>
+    <circle r="43" fill="none" stroke="${G}" stroke-opacity=".45" stroke-width=".6"/>
+  </svg>`;
+}
+const MARK = `
+  <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="5.5"/>
+  <circle cx="47" cy="33.5" r="7.6" fill="currentColor"/>
+  <path d="M38.5 48.5 Q38.5 44.5 42.5 44.5 L56.5 44.5 L60.5 51 L56.8 81 L42 81 Z" fill="currentColor"/>
+  <path d="M58 53.5 L84 39.5" stroke="currentColor" stroke-width="6.6" fill="none"/>
+  <path d="M21 59.5 L36 78 L41.5 71" stroke="currentColor" stroke-width="6" fill="none"/>
+  <line x1="84" y1="39.5" x2="76.5" y2="27.5" stroke="#c8962e" stroke-width="1.8" stroke-linecap="round"/>
+  <g transform="translate(76 26.5)">
+    <g class="spk2"><path d="M0 -12 L0 12 M-12 0 L12 0 M-8 -8 L8 8 M-8 8 L8 -8" stroke="#ffcf5a" stroke-width="1" opacity=".85"/></g>
+    <g class="spk"><path d="M0 -8 L1.5 -1.5 L8 0 L1.5 1.5 L0 8 L-1.5 1.5 L-8 0 L-1.5 -1.5Z" fill="#ffe9a0"/><circle r="2.3" fill="#fff"/></g>
+  </g>`;
+const logoHTML = h => `<span class="logo" style="--lh:${h}px" role="img" aria-label="InstaVeritas"><svg class="lm" viewBox="0 0 100 100" aria-hidden="true">${MARK}</svg><span class="wm" aria-hidden="true">InstaVeritas</span></span>`;
+function marigold(cx, cy, r, c1, c2) {
+  let s = '';
+  for (let i = 0; i < 12; i++) { const a = i / 12 * TAU; s += `<circle cx="${(cx + Math.cos(a) * r * .6).toFixed(1)}" cy="${(cy + Math.sin(a) * r * .6).toFixed(1)}" r="${(r * .46).toFixed(1)}" fill="${c1}"/>`; }
+  for (let i = 0; i < 7; i++) { const a = i / 7 * TAU + .3; s += `<circle cx="${(cx + Math.cos(a) * r * .28).toFixed(1)}" cy="${(cy + Math.sin(a) * r * .28).toFixed(1)}" r="${(r * .33).toFixed(1)}" fill="${c2}"/>`; }
+  return s + `<circle cx="${cx}" cy="${cy}" r="${(r * .2).toFixed(1)}" fill="#b84a00"/>`;
+}
+function leaf(cx, cy, k = 1) { return `<path d="M${cx} ${cy} C${cx + 7 * k} ${cy + 6 * k} ${cx + 6 * k} ${cy + 16 * k} ${cx} ${cy + 22 * k} C${cx - 6 * k} ${cy + 16 * k} ${cx - 7 * k} ${cy + 6 * k} ${cx} ${cy}Z" fill="#2f8a3b"/>`; }
+function toranTile() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" width="120" height="40"><path d="M0 5 Q30 22 60 5 T120 5" stroke="#3d8b37" stroke-width="2" fill="none"/>
+    ${marigold(15, 12, 7, '#ff8a1a', '#ffab3d')}${marigold(30, 15, 7, '#ffc21a', '#ffdd66')}${marigold(45, 12, 7, '#ff8a1a', '#ffab3d')}
+    ${marigold(75, 12, 7, '#ffc21a', '#ffdd66')}${marigold(90, 15, 7, '#ff8a1a', '#ffab3d')}${marigold(105, 12, 7, '#ffc21a', '#ffdd66')}${leaf(60, 6, .7)}${leaf(0, 6, .7)}${leaf(120, 6, .7)}</svg>`;
+}
+{ let h = ''; for (let i = 0; i < 90; i++) { const s = Math.random() < .15 ? 2.5 : 1.5; h += `<i style="left:${(Math.random() * 100).toFixed(2)}%;top:${(Math.random() * 100).toFixed(2)}%;width:${s}px;height:${s}px;--t:${rand(2, 5).toFixed(2)}s;--d:${rand(0, 4).toFixed(2)}s"></i>`; } $('#stars').innerHTML = h; }
+$('#toran').style.backgroundImage = svgURL(toranTile());
+$$('[data-logo]').forEach(el => el.innerHTML = logoHTML(+el.dataset.logo));
+$('#drumArt').innerHTML = drumSVG();
+
+/* ---------- fireworks ---------- */
+const cv = $('#fx'), ctx = cv.getContext('2d');
+let W = 0, H = 0, parts = [], rockets = [], fxOn = false, lastT = 0;
+const PALS = [['#ffd166', '#ff9f1c', '#fff3b0'], ['#ff5d8f', '#ffd6e7', '#ffd166'], ['#2ec4b6', '#cbf3f0', '#ffd166'], ['#c77dff', '#e0aaff', '#fff']];
+function fitFx() { const d = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight; cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0); }
+fitFx(); addEventListener('resize', fitFx);
+function spark(p) { if (parts.length < 1500) { p.max = p.life; parts.push(p); } }
+function burst(x, y, sc = 1, pal) {
+  if (reduced) return;
+  pal = pal || pick(PALS);
+  spark({ x, y, vx: 0, vy: 0, g: 0, drag: 1, life: 16, size: 60 * sc, color: '#fff1c1', glow: true });
+  const n = Math.round(90 * sc), sp = rand(4, 6) * sc;
+  for (let i = 0; i < n; i++) { const a = Math.random() * TAU, v = sp * Math.sqrt(Math.random()); spark({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, g: .055, drag: .972, life: rand(45, 80), size: 2.2, color: pal[i % pal.length], flicker: Math.random() < .25 }); }
+  startFx();
+}
+function launch(x0, y0, x1, y1, sc) { const g = .09, vy = -Math.sqrt(2 * g * Math.max(80, y0 - y1)); rockets.push({ x: x0, y: y0, vx: (x1 - x0) / (-vy / g), vy, g, sc }); startFx(); }
+function startFx() { if (!fxOn) { fxOn = true; lastT = performance.now(); requestAnimationFrame(fxTick); } }
+function fxTick(now) {
+  const dt = Math.min(2.5, (now - lastT) / 16.667); lastT = now;
+  ctx.clearRect(0, 0, W, H); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
+  for (let i = rockets.length - 1; i >= 0; i--) {
+    const r = rockets[i]; r.vy += r.g * dt; r.x += r.vx * dt; r.y += r.vy * dt;
+    spark({ x: r.x, y: r.y, vx: rand(-.4, .4), vy: rand(.4, 1.4), g: .03, drag: .95, life: 22, size: 1.8, color: '#ffc35c', flicker: true });
+    if (r.vy >= -.5) { rockets.splice(i, 1); burst(r.x, r.y, r.sc); }
+  }
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const p = parts[i], k = Math.pow(p.drag, dt);
+    p.vx *= k; p.vy *= k; p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt;
+    if (p.life <= 0) { parts[i] = parts[parts.length - 1]; parts.pop(); continue; }
+    let a = p.life / p.max;
+    if (p.glow) { const rad = p.size * (1.4 - a * .6), g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad); g.addColorStop(0, p.color); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.globalAlpha = a * .8; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, rad, 0, TAU); ctx.fill(); continue; }
+    if (p.flicker && Math.random() < .3) a *= .25;
+    ctx.globalAlpha = a; ctx.strokeStyle = p.color; ctx.lineWidth = p.size;
+    ctx.beginPath(); ctx.moveTo(p.x - p.vx * 1.8, p.y - p.vy * 1.8); ctx.lineTo(p.x, p.y); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  if (parts.length || rockets.length) requestAnimationFrame(fxTick); else { fxOn = false; ctx.clearRect(0, 0, W, H); }
+}
+function celebrate() { for (let i = 0; i < 7; i++) setTimeout(() => launch(rand(.1, .9) * W, H + 10, rand(.1, .9) * W, rand(.08, .4) * H, rand(.8, 1.2)), i * 180); }
+
+/* ---------- state (saved in this browser so a refresh never loses the game) ---------- */
+const KEY = 'iv-diwali-tambola-v1';
+const PRIZES = [
+  ['early', 'Early Five', 'Any 5 numbers on the ticket'],
+  ['top', 'Top Line', 'All 5 numbers in the first row'],
+  ['middle', 'Middle Line', 'All 5 numbers in the second row'],
+  ['bottom', 'Bottom Line', 'All 5 numbers in the third row'],
+  ['corners', 'Four Corners', 'First and last numbers of the top and bottom rows'],
+  ['full', 'Full House', 'All 15 numbers on the ticket']
+];
+const newCode = () => { const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 4; i++) s += A[(Math.random() * A.length) | 0]; return s; };
+let S = { called: [], claims: {}, setCode: newCode(), voice: true, speed: 8, tkCount: 24 };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+/* ---------- board ---------- */
+const board = $('#board');
+board.innerHTML = Array.from({ length: 90 }, (_, i) => `<div class="cell" id="c${i + 1}" role="img" aria-label="${i + 1}, not called yet">${i + 1}</div>`).join('');
+function paint() {
+  const set = new Set(S.called), last = S.called[S.called.length - 1];
+  for (let n = 1; n <= 90; n++) {
+    const el = $('#c' + n), isC = set.has(n);
+    el.classList.toggle('called', isC); el.classList.toggle('latest', n === last);
+    el.setAttribute('aria-label', isC ? `${n}, called` : `${n}, not called yet`);
+  }
+  const prev = S.called.slice(-4, -1).reverse();
+  ['p1', 'p2', 'p3'].forEach((id, i) => { const el = $('#' + id); el.textContent = prev[i] || ''; el.classList.toggle('blank', !prev[i]); });
+  $('#countCalled').textContent = S.called.length;
+  $('#countLeft').textContent = 90 - S.called.length;
+  const big = $('#bigNum');
+  if (last) { big.textContent = last; big.classList.remove('empty'); $('#callName').textContent = CALLS[last]; }
+  else { big.textContent = 'Ready when you are'; big.classList.add('empty'); $('#callName').textContent = 'Press Call next to light the first number'; }
+  $('#callBtn').disabled = rolling || S.called.length >= 90;
+  $('#callBtn').textContent = S.called.length >= 90 ? 'All 90 numbers called' : '🪔 Call next';
+  $('#undoBtn').disabled = rolling || !S.called.length;
+}
+
+/* ---------- voice ---------- */
+let voice = null;
+function pickVoice() { const vs = speechSynthesis.getVoices(); voice = vs.find(v => /en[-_]IN/i.test(v.lang)) || vs.find(v => /en[-_]GB/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null; }
+if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function say(text) {
+  if (!S.voice || !('speechSynthesis' in window)) return;
+  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); if (voice) u.voice = voice; u.rate = .92; u.pitch = 1; speechSynthesis.speak(u); } catch (e) {}
+}
+
+/* ---------- calling ---------- */
+let rolling = false;
+function callNext() {
+  if (rolling || S.called.length >= 90) return;
+  const left = []; for (let n = 1; n <= 90; n++) if (!S.called.includes(n)) left.push(n);
+  const n = left[(Math.random() * left.length) | 0];
+  rolling = true; paint();
+  const drum = $('#drum'), big = $('#bigNum');
+  drum.classList.add('rolling'); big.classList.remove('empty', 'reveal');
+  const t0 = performance.now(), D = reduced ? 150 : 1100;
+  const spinNum = () => {
+    if (performance.now() - t0 < D) { big.textContent = pick(left); setTimeout(spinNum, 70); return; }
+    drum.classList.remove('rolling');
+    S.called.push(n); save(); rolling = false; paint();
+    void big.offsetWidth; big.classList.add('reveal');
+    const cell = $('#c' + n); cell.classList.add('flash'); setTimeout(() => cell.classList.remove('flash'), 500);
+    const r = cell.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, .55);
+    const d = $('#drum').getBoundingClientRect(); burst(d.left + d.width / 2, d.top + 10, .45);
+    say(spoken(n));
+    if (S.called.length === 90) { toast('All 90 numbers are out!'); stopAuto(); }
+  };
+  spinNum();
+}
+function undo() {
+  if (rolling || !S.called.length) return;
+  const n = S.called.pop(); save(); paint(); toast(`Took back ${n}`);
+}
+
+/* ---------- auto call ---------- */
+let autoT = 0, autoOn = false;
+function startAuto() { autoOn = true; $('#autoBtn').classList.add('on'); $('#autoBtn').textContent = '⏸ Pause auto'; $('#autoBtn').setAttribute('aria-pressed', 'true'); tickAuto(true); }
+function stopAuto() { autoOn = false; clearTimeout(autoT); $('#autoBtn').classList.remove('on'); $('#autoBtn').textContent = '▶ Auto call'; $('#autoBtn').setAttribute('aria-pressed', 'false'); }
+function tickAuto(first) { clearTimeout(autoT); if (!autoOn) return; if (!first) callNext(); autoT = setTimeout(() => tickAuto(false), (first ? 300 : S.speed * 1000)); }
+$('#autoBtn').addEventListener('click', () => autoOn ? stopAuto() : startAuto());
+$('#speed').value = String(S.speed);
+$('#speed').addEventListener('change', e => { S.speed = +e.target.value; save(); if (autoOn) { clearTimeout(autoT); autoT = setTimeout(() => tickAuto(false), S.speed * 1000); } });
+
+/* ---------- buttons ---------- */
+$('#callBtn').addEventListener('click', callNext);
+$('#undoBtn').addEventListener('click', undo);
+function setVoiceBtn() { const b = $('#voiceBtn'); b.classList.toggle('on', S.voice); b.textContent = S.voice ? '🔊 Voice on' : '🔇 Voice off'; b.setAttribute('aria-pressed', String(S.voice)); }
+setVoiceBtn();
+$('#voiceBtn').addEventListener('click', () => { S.voice = !S.voice; save(); setVoiceBtn(); if (!S.voice && 'speechSynthesis' in window) speechSynthesis.cancel(); });
+function twoTap(btn, label, action) {
+  let armed = false, t = 0; const orig = btn.textContent;
+  btn.addEventListener('click', () => {
+    if (!armed) { armed = true; btn.classList.add('armed'); btn.textContent = label; t = setTimeout(() => { armed = false; btn.classList.remove('armed'); btn.textContent = orig; }, 3500); return; }
+    clearTimeout(t); armed = false; btn.classList.remove('armed'); btn.textContent = orig; action();
+  });
+}
+twoTap($('#newGame'), 'Tap again to clear everything', () => { stopAuto(); S.called = []; save(); paint(); toast('Fresh board. Happy Diwali!'); });
+$('#fsBtn').addEventListener('click', () => { const d = document.documentElement; if (!document.fullscreenElement) d.requestFullscreen && d.requestFullscreen().catch(() => {}); else document.exitFullscreen(); });
+addEventListener('keydown', e => {
+  if (e.target.closest('input, textarea, select') || !$('#ticketsModal').hidden || !$('#checkModal').hidden) { if (e.key === 'Escape') closeModals(); return; }
+  if (e.key === ' ') { e.preventDefault(); callNext(); }
+  else if (e.key === 'a' || e.key === 'A') autoOn ? stopAuto() : startAuto();
+});
+let toastT = 0;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600); }
+
+/* ---------- tickets: seeded, so any ticket can be rebuilt from its number ---------- */
+function seeded(str) {
+  let h = 1779033703 ^ str.length;
+  for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; }
+  let a = h >>> 0;
+  return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+function makeTicket(code, id) {
+  const r = seeded(`${code}#${id}`);
+  for (let attempt = 0; attempt < 400; attempt++) {
+    const counts = Array(9).fill(1); let extra = 6;
+    while (extra > 0) { const c = (r() * 9) | 0; if (counts[c] < 3) { counts[c]++; extra--; } }
+    const used = [[], [], []].map(() => Array(9).fill(false)), rc = [0, 0, 0];
+    const order = [...Array(9).keys()].map(c => [c, counts[c] + r() * .5]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+    let ok = true;
+    for (const c of order) {
+      const rows = [0, 1, 2].filter(x => rc[x] < 5).map(x => [x, rc[x] + r() * .9]).sort((a, b) => a[1] - b[1]).map(x => x[0]);
+      if (rows.length < counts[c]) { ok = false; break; }
+      rows.slice(0, counts[c]).forEach(x => { used[x][c] = true; rc[x]++; });
+    }
+    if (!ok || rc.some(v => v !== 5)) continue;
+    const t = [[], [], []].map(() => Array(9).fill(0));
+    for (let c = 0; c < 9; c++) {
+      const lo = c === 0 ? 1 : c * 10, hi = c === 8 ? 90 : c * 10 + 9, pool = [];
+      for (let n = lo; n <= hi; n++) pool.push(n);
+      const chosen = [];
+      for (let k = 0; k < counts[c]; k++) chosen.push(pool.splice((r() * pool.length) | 0, 1)[0]);
+      chosen.sort((a, b) => a - b);
+      let j = 0; for (let x = 0; x < 3; x++) if (used[x][c]) t[x][c] = chosen[j++];
+    }
+    return t;
+  }
+  return null;
+}
+function ticketHTML(t, id, calledSet) {
+  return `<div class="ticket"><div class="th"><span>InstaVeritas Diwali Tambola</span><span>Set ${S.setCode}, <span class="tn">ticket ${id}</span></span></div>
+    <div class="tgrid">${t.flat().map(n => n ? `<span class="${calledSet ? (calledSet.has(n) ? 'hit' : 'miss') : ''}">${n}</span>` : '<span class="e"></span>').join('')}</div></div>`;
+}
+function renderTickets() {
+  $('#setCode').textContent = S.setCode;
+  $('#tkCount').value = String(S.tkCount);
+  let h = ''; for (let i = 1; i <= S.tkCount; i++) h += ticketHTML(makeTicket(S.setCode, i), i);
+  $('#tkPreview').innerHTML = h;
+}
+$('#tkCount').addEventListener('change', e => { S.tkCount = +e.target.value; save(); renderTickets(); });
+twoTap($('#newSet'), 'Tap again: old tickets stop matching', () => { S.setCode = newCode(); save(); renderTickets(); toast(`New ticket set ${S.setCode}`); });
+$('#printBtn').addEventListener('click', () => {
+  $('#printSheet').innerHTML = `<div class="tickets">${$('#tkPreview').innerHTML}</div>`;
+  try { window.print(); } catch (e) { toast('Printing is blocked here. Open the page in its own tab to print.'); }
+});
+
+/* ---------- checking claims ---------- */
+function checkTicket() {
+  const id = parseInt($('#ckId').value, 10), out = $('#ckTicketResult');
+  if (!id || id < 1 || id > 999) { out.innerHTML = '<p class="verdict bad">Enter a ticket number from 1 to 999.</p>'; return; }
+  const t = makeTicket(S.setCode, id), set = new Set(S.called);
+  const rows = t.map(r => r.filter(Boolean)), all = rows.flat(), hits = all.filter(n => set.has(n)).length;
+  const corners = [rows[0][0], rows[0][4], rows[2][0], rows[2][4]];
+  const res = { early: hits >= 5, top: rows[0].every(n => set.has(n)), middle: rows[1].every(n => set.has(n)), bottom: rows[2].every(n => set.has(n)), corners: corners.every(n => set.has(n)), full: hits === 15 };
+  out.innerHTML = ticketHTML(t, id, set) +
+    `<div class="badges">${PRIZES.map(([k, nm]) => `<span class="badge ${res[k] ? 'yes' : ''}">${res[k] ? '✓' : '✗'} ${nm}</span>`).join('')}</div>
+     <p class="verdict ${hits ? 'good' : 'bad'}">${hits} of 15 numbers called on this ticket.</p>`;
+}
+$('#ckGo').addEventListener('click', checkTicket);
+$('#ckId').addEventListener('keydown', e => { if (e.key === 'Enter') checkTicket(); });
+$('#ckNumsGo').addEventListener('click', () => {
+  const nums = [...new Set(($('#ckNums').value.match(/\d+/g) || []).map(Number).filter(n => n >= 1 && n <= 90))];
+  const out = $('#ckNumsResult');
+  if (!nums.length) { out.innerHTML = '<p class="verdict bad">Type at least one number between 1 and 90.</p>'; return; }
+  const set = new Set(S.called), miss = nums.filter(n => !set.has(n));
+  out.innerHTML = `<div class="numlist">${nums.map(n => `<span class="${set.has(n) ? 'y' : 'n'}">${n}</span>`).join('')}</div>
+    <p class="verdict ${miss.length ? 'bad' : 'good'}">${miss.length ? `Not valid yet. Still waiting on ${miss.join(', ')}.` : `Valid! All ${nums.length} numbers have been called.`}</p>`;
+});
+function renderHistory() {
+  $('#history').innerHTML = S.called.length ? S.called.map((n, i) => `<span><small>#${i + 1}</small>${n}</span>`).join('') : '<p class="lead">No numbers called yet.</p>';
+}
+$$('[data-tab]').forEach(b => b.addEventListener('click', () => {
+  $$('[data-tab]').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-selected', String(on)); });
+  $$('[data-pane]').forEach(p => p.hidden = p.dataset.pane !== b.dataset.tab);
+  if (b.dataset.tab === 'byHist') renderHistory();
+}));
+
+/* ---------- modals ---------- */
+function openModal(id) { $('#' + id).hidden = false; const f = $('#' + id + ' [data-close]'); f && f.focus(); }
+function closeModals() { $$('.modal').forEach(m => m.hidden = true); }
+$('#openTickets').addEventListener('click', () => { renderTickets(); openModal('ticketsModal'); });
+$('#openCheck').addEventListener('click', () => { renderHistory(); openModal('checkModal'); });
+$$('[data-close]').forEach(b => b.addEventListener('click', closeModals));
+$$('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m) closeModals(); }));
+
+/* ---------- go ---------- */
+paint();
+})();
+</script>
+</body>
+</html>
