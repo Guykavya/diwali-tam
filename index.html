@@ -27,7 +27,7 @@
 :root[data-theme="dark"]{ --bg-0:#061727; --cream:#fff3dc; }
 html{ scroll-padding-top:env(safe-area-inset-top, 0px); }
 *,*::before,*::after{ box-sizing:inherit; }
-html,body{ margin:0; height:100%; }
+html,body{ margin:0; }
 body{ color:var(--cream); font-family:var(--f-body); -webkit-font-smoothing:antialiased;
   background:radial-gradient(120% 90% at 50% 0%, var(--bg-3) 0%, var(--bg-2) 30%, var(--bg-1) 62%, var(--bg-0) 100%) fixed, var(--bg-0); }
 button,input,select,textarea{ font:inherit; color:inherit; }
@@ -39,7 +39,7 @@ button,input,select,textarea{ font:inherit; color:inherit; }
 #fx{ position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:40; }
 
 /* ---------- layout ---------- */
-.app{ position:relative; z-index:1; height:100%; display:grid; grid-template-rows:auto auto 1fr; }
+.app{ position:relative; z-index:1; }
 .toran{ height:34px; background-repeat:repeat-x; background-size:auto 34px; background-position:center top; filter:drop-shadow(0 3px 4px rgba(0,0,0,.35)); }
 header.top{ display:flex; align-items:center; gap:18px; padding:4px clamp(14px,2.4vw,32px) 10px; flex-wrap:wrap; }
 .plate{ display:inline-flex; align-items:center; padding:8px 16px; border-radius:14px; background:linear-gradient(180deg,#fffcf4,var(--cream-2)); box-shadow:0 0 0 2px var(--gold), 0 8px 20px rgba(0,0,0,.35); }
@@ -64,8 +64,9 @@ header.top{ display:flex; align-items:center; gap:18px; padding:4px clamp(14px,2
 .btn.warn{ border-color:rgba(255,107,107,.55); }
 .btn.warn.armed{ background:#b3263d; border-color:#ff8a8a; color:#fff; }
 
-main{ min-height:0; display:grid; grid-template-columns:minmax(330px,400px) 1fr; gap:clamp(14px,2vw,28px); padding:0 clamp(14px,2.4vw,32px) clamp(14px,2vw,24px); }
-aside{ min-height:0; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-right:4px; }
+main{ align-items:start; display:grid; grid-template-columns:minmax(330px,400px) 1fr; gap:clamp(14px,2vw,28px); padding:0 clamp(14px,2.4vw,32px) clamp(14px,2vw,24px); }
+aside{ position:sticky; top:10px; max-height:calc(100dvh - 20px); overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-right:4px; }
+.right{ display:flex; flex-direction:column; gap:22px; min-width:0; }
 .panel{ background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:16px; }
 
 /* ---------- the caller (rangoli drum) ---------- */
@@ -115,7 +116,7 @@ kbd{ font:600 12px var(--f-body); border:1px solid var(--line); border-radius:5p
 .prize.won input{ border-color:var(--gold); background:rgba(255,207,90,.14); font-weight:600; }
 
 /* ---------- the board ---------- */
-.board-wrap{ min-height:0; container-type:size; display:grid; place-items:center; }
+.board-wrap{ height:calc(100dvh - 118px); min-height:420px; container-type:size; display:grid; place-items:center; }
 .board{ width:min(100cqw, 100cqh * 1.62); aspect-ratio:1.62; container-type:inline-size; display:grid;
   grid-template-columns:repeat(10,1fr); grid-template-rows:repeat(9,1fr); gap:clamp(4px,.6cqi,9px);
   padding:clamp(8px,1.1cqi,16px); border-radius:24px; background:rgba(4,16,30,.45); border:1px solid var(--line);
@@ -174,14 +175,64 @@ textarea{ width:100%; min-height:90px; background:rgba(255,255,255,.06); border:
 .toast.show{ opacity:1; transform:translate(-50%,0); }
 #printSheet{ display:none; }
 
+/* ---------- prizes up for grabs (below the board) ---------- */
+.pending{ padding:20px clamp(14px,2vw,24px); }
+.pend-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 18px; margin-bottom:8px; }
+.pend-head h2{ margin:0; font:400 30px/1.1 var(--f-display); color:var(--gold); }
+.pend-head p{ margin:0; color:var(--muted); font-size:15px; }
+.pend-head p b{ color:var(--cream); }
+.pend-head .btn{ margin-left:auto; }
+.pend{ display:grid; grid-template-columns:minmax(200px,1.2fr) minmax(200px,1.4fr) 120px; gap:8px 12px; align-items:center;
+  padding:12px 0; border-top:1px solid rgba(255,207,90,.13); transition:opacity .4s, transform .4s; }
+.pend:first-child{ border-top:0; }
+.pend.leaving{ opacity:0; transform:translateX(40px); }
+.pend.locked{ opacity:.55; }
+.pinfo{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.pn{ font:700 17px/1.25 var(--f-body); }
+.pr{ font:500 13px/1.35 var(--f-body); color:var(--muted); }
+.pamt{ font:800 19px var(--f-body); color:var(--gold); text-align:right; font-variant-numeric:tabular-nums; }
+.pend input,.ptable input,.ptable textarea{ min-width:0; width:100%; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,207,90,.32); border-radius:10px; padding:9px 11px; font-size:15px; }
+.pend input::placeholder,.ptable input::placeholder{ color:#7f93a6; }
+.pend input.need{ border-color:var(--no); animation:shake .3s; }
+@keyframes shake{ 25%{ transform:translateX(-4px) } 75%{ transform:translateX(4px) } }
+.pend .award{ padding:10px 8px; }
+.pv{ grid-column:1 / -1; margin:-2px 0 0; min-height:0; font:600 13.5px var(--f-body); color:var(--muted); }
+.pv:empty{ display:none; }
+.pv.good{ color:#9ff0cf; } .pv.bad{ color:#ffb3b3; }
+.all-done{ margin:10px 0 4px; font:600 17px var(--f-body); color:var(--cream); }
+.count-pill{ display:inline-block; min-width:42px; margin-left:4px; padding:2px 7px; border-radius:999px; background:rgba(255,207,90,.2); font-size:12.5px; }
+
+/* ---------- prize list modal ---------- */
+.sheet.wide{ width:min(1080px,100%); }
+.tbl-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:14px; }
+.ptable{ width:100%; min-width:760px; border-collapse:collapse; font-size:15px; }
+.ptable th{ text-align:left; padding:11px 12px; font:700 13.5px var(--f-body); color:var(--gold); background:rgba(255,207,90,.08); border-bottom:1px solid var(--line); }
+.ptable td{ padding:11px 12px; border-top:1px solid rgba(255,207,90,.1); vertical-align:middle; }
+.ptable tr.won td{ background:rgba(255,207,90,.07); }
+.ptable .amt{ font-weight:800; color:var(--gold); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.ptable .rule{ display:block; font-size:12.5px; color:var(--muted); }
+.ptable .wn{ font-weight:700; }
+.ptable .each{ display:block; font-size:12.5px; color:var(--muted); font-weight:500; }
+.ptable .none{ color:#7f93a6; font-style:italic; }
+.ptable .acts{ white-space:nowrap; text-align:right; }
+.ptable .acts .btn{ padding:6px 10px; font-size:13px; margin-left:4px; }
+.ptable tfoot td{ font-weight:800; border-top:1.5px solid var(--line); }
+.tot{ margin-left:auto; font:600 15px var(--f-body); color:var(--muted); }
+.tot b{ color:var(--gold); }
+.copybox{ width:100%; min-height:160px; margin-top:12px; }
+
+
 @media (max-width: 980px){
   html,body{ height:auto; }
   .app{ height:auto; }
   main{ grid-template-columns:1fr; }
   aside{ display:contents; }
-  .caller{ order:1; } .board-wrap{ order:2; } #newGame{ order:3; }
+  .caller{ order:1; } .right{ order:2; } #newGame{ order:3; }
   .hint{ display:none; }
-  .board-wrap{ container-type:normal; }
+  .board-wrap{ container-type:normal; height:auto; min-height:0; }
+  .pend{ grid-template-columns:1fr auto; }
+  .pend .pinfo{ grid-column:1 / -1; }
+  .pend .pw{ grid-column:1; } .pend .award{ grid-column:2; }
   .board{ width:100%; aspect-ratio:1.3; }
   .cell{ font-size:4.6cqi; }
   .tally{ margin-left:0; text-align:left; }
@@ -210,7 +261,6 @@ textarea{ width:100%; min-height:90px; background:rgba(255,255,255,.06); border:
     <h1 class="brand-title">Diwali Tambola</h1>
     <div class="tally" aria-live="polite"><b id="countCalled">0</b> called, <span id="countLeft">90</span> left</div>
     <div class="top-actions">
-      <button class="btn" id="openTickets" type="button">🎟️ Tickets</button>
       <button class="btn" id="openCheck" type="button">✅ Check a claim</button>
       <button class="btn" id="fsBtn" type="button">⛶ Fullscreen</button>
     </div>
@@ -242,27 +292,20 @@ textarea{ width:100%; min-height:90px; background:rgba(255,255,255,.06); border:
       <button class="btn warn" id="newGame" type="button">✨ New game (clear the board)</button>
     </aside>
 
-    <section class="board-wrap" aria-label="Numbers 1 to 90">
-      <div class="board" id="board"></div>
-    </section>
-  </main>
-</div>
-
-<!-- Tickets -->
-<div class="modal" id="ticketsModal" hidden role="dialog" aria-modal="true" aria-labelledby="tkTitle">
-  <div class="sheet">
-    <button class="x" type="button" data-close aria-label="Close">×</button>
-    <h2 id="tkTitle">Tambola tickets</h2>
-    <p class="lead">Every ticket follows the classic rules: 3 rows, 5 numbers in each row, and each column holds its own range (1–9, 10–19 … 80–90). Print them, or save as PDF and share on WhatsApp. Ticket numbers are tied to the set code, so you can check any claim later.</p>
-    <div class="toolbar">
-      <label for="tkCount">How many</label>
-      <select id="tkCount"><option>6</option><option>12</option><option selected>24</option><option>36</option><option>48</option><option>60</option><option>90</option></select>
-      <span>Set code <span class="set-code" id="setCode"></span></span>
-      <button class="btn warn" id="newSet" type="button">New ticket set</button>
-      <button class="btn on" id="printBtn" type="button">🖨️ Print or save PDF</button>
+    <div class="right">
+      <section class="board-wrap" aria-label="Numbers 1 to 90">
+        <div class="board" id="board"></div>
+      </section>
+      <section class="panel pending" aria-labelledby="pendTitle">
+        <div class="pend-head">
+          <h2 id="pendTitle">Prizes still up for grabs</h2>
+          <p id="pendSum"></p>
+          <button class="btn" id="openPrizes2" type="button">🏆 See all winners</button>
+        </div>
+        <div id="pendList"></div>
+      </section>
     </div>
-    <div class="tickets" id="tkPreview"></div>
-  </div>
+  </main>
 </div>
 
 <!-- Check -->
@@ -271,17 +314,11 @@ textarea{ width:100%; min-height:90px; background:rgba(255,255,255,.06); border:
     <button class="x" type="button" data-close aria-label="Close">×</button>
     <h2 id="ckTitle">Check a claim</h2>
     <div class="tabs" role="tablist">
-      <button class="btn on" type="button" role="tab" data-tab="byTicket" aria-selected="true">By ticket number</button>
-      <button class="btn" type="button" role="tab" data-tab="byNums" aria-selected="false">Type the numbers</button>
+      <button class="btn on" type="button" role="tab" data-tab="byNums" aria-selected="true">Type the numbers</button>
       <button class="btn" type="button" role="tab" data-tab="byHist" aria-selected="false">Call history</button>
     </div>
-    <div data-pane="byTicket">
-      <p class="lead">For tickets printed from this board. Enter the ticket number to see it marked against the numbers called so far.</p>
-      <div class="toolbar"><label for="ckId">Ticket no.</label><input id="ckId" type="number" min="1" max="999" inputmode="numeric" style="width:110px"><button class="btn on" id="ckGo" type="button">Check</button></div>
-      <div class="result" id="ckTicketResult"></div>
-    </div>
-    <div data-pane="byNums" hidden>
-      <p class="lead">For any ticket, including paper ones. Type the numbers of the line or ticket being claimed, separated by spaces or commas.</p>
+    <div data-pane="byNums">
+      <p class="lead">Type the numbers the player is claiming, separated by spaces or commas, to see if they have all been called.</p>
       <textarea id="ckNums" placeholder="e.g. 4 17 32 56 81"></textarea>
       <div class="toolbar" style="margin-top:10px"><button class="btn on" id="ckNumsGo" type="button">Check these numbers</button></div>
       <div class="result" id="ckNumsResult"></div>
@@ -293,8 +330,23 @@ textarea{ width:100%; min-height:90px; background:rgba(255,255,255,.06); border:
   </div>
 </div>
 
+<!-- Prize list -->
+<div class="modal" id="prizesModal" hidden role="dialog" aria-modal="true" aria-labelledby="pzTitle">
+  <div class="sheet wide">
+    <button class="x" type="button" data-close aria-label="Close">×</button>
+    <h2 id="pzTitle">Prize list</h2>
+    <div class="toolbar">
+      <label for="recSel">Showing</label>
+      <select id="recSel"></select>
+      <span class="tot" id="recTotal"></span>
+    </div>
+    <div class="tbl-wrap"><table class="ptable" id="ptable"></table></div>
+    <div class="toolbar" id="recActions" style="margin-top:14px"></div>
+    <div id="copyArea"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status"></div>
-<div id="printSheet"></div>
 
 <script>
 (() => {
@@ -420,17 +472,26 @@ function celebrate() { for (let i = 0; i < 7; i++) setTimeout(() => launch(rand(
 
 /* ---------- state (saved in this browser so a refresh never loses the game) ---------- */
 const KEY = 'iv-diwali-tambola-v1';
-const PRIZES = [
-  ['early', 'Early Five', 'Any 5 numbers on the ticket'],
-  ['top', 'Top Line', 'All 5 numbers in the first row'],
-  ['middle', 'Middle Line', 'All 5 numbers in the second row'],
-  ['bottom', 'Bottom Line', 'All 5 numbers in the third row'],
-  ['corners', 'Four Corners', 'First and last numbers of the top and bottom rows'],
-  ['full', 'Full House', 'All 15 numbers on the ticket']
+const SHEET_PRIZES = [
+  ['Fastest 5 / Jaldi 5', 'Any 5 numbers on the ticket', 5000],
+  ['1st Row', 'All 5 numbers in row 1', 5000],
+  ['2nd Row', 'All 5 numbers in row 2', 5000],
+  ['3rd Row', 'All 5 numbers in row 3', 5000],
+  ['4 Corners', '1st and last numbers of row 1 and of row 3', 5000],
+  ['1st Full House', 'All numbers on the ticket', 10000],
+  ['2nd Full House', 'All numbers on the ticket, after the 1st full house', 5000],
+  ['3rd Full House', 'All numbers on the ticket, after the 2nd full house', 4000],
+  ['Low BP', 'Smallest number on the ticket', 2000],
+  ['High BP', 'Largest number on the ticket', 2000],
+  ['Laddoo', '3rd number in the middle row', 2000]
 ];
+const freshPrizes = () => SHEET_PRIZES.map(([name, rule, amount], i) => ({ id: 'p' + i + '-' + Date.now().toString(36), name, rule, amount, winners: '', at: 0, draft: '' }));
 const newCode = () => { const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 4; i++) s += A[(Math.random() * A.length) | 0]; return s; };
-let S = { called: [], claims: {}, setCode: newCode(), voice: true, speed: 8, tkCount: 24 };
+let S = { called: [], setCode: newCode(), voice: true, speed: 8, tkCount: 24, prizes: null, archive: [] };
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) {}
+delete S.claims;
+if (!Array.isArray(S.prizes) || !S.prizes.length) S.prizes = freshPrizes();
+if (!Array.isArray(S.archive)) S.archive = [];
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
 /* ---------- board ---------- */
@@ -514,81 +575,17 @@ function twoTap(btn, label, action) {
     clearTimeout(t); armed = false; btn.classList.remove('armed'); btn.textContent = orig; action();
   });
 }
-twoTap($('#newGame'), 'Tap again to clear everything', () => { stopAuto(); S.called = []; save(); paint(); toast('Fresh board. Happy Diwali!'); });
+twoTap($('#newGame'), 'Tap again: results get saved', () => { stopAuto(); const kept = archiveLive(); S.called = []; resetWinners(S.prizes); save(); paint(); renderPending(); toast(kept ? 'Fresh board. Last game’s winners are saved under Prizes.' : 'Fresh board. Happy Diwali!'); });
 $('#fsBtn').addEventListener('click', () => { const d = document.documentElement; if (!document.fullscreenElement) d.requestFullscreen && d.requestFullscreen().catch(() => {}); else document.exitFullscreen(); });
 addEventListener('keydown', e => {
-  if (e.target.closest('input, textarea, select') || !$('#ticketsModal').hidden || !$('#checkModal').hidden) { if (e.key === 'Escape') closeModals(); return; }
+  if (e.target.closest('input, textarea, select') || $$('.modal').some(m => !m.hidden)) { if (e.key === 'Escape') closeModals(); return; }
   if (e.key === ' ') { e.preventDefault(); callNext(); }
   else if (e.key === 'a' || e.key === 'A') autoOn ? stopAuto() : startAuto();
 });
 let toastT = 0;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600); }
 
-/* ---------- tickets: seeded, so any ticket can be rebuilt from its number ---------- */
-function seeded(str) {
-  let h = 1779033703 ^ str.length;
-  for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; }
-  let a = h >>> 0;
-  return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-}
-function makeTicket(code, id) {
-  const r = seeded(`${code}#${id}`);
-  for (let attempt = 0; attempt < 400; attempt++) {
-    const counts = Array(9).fill(1); let extra = 6;
-    while (extra > 0) { const c = (r() * 9) | 0; if (counts[c] < 3) { counts[c]++; extra--; } }
-    const used = [[], [], []].map(() => Array(9).fill(false)), rc = [0, 0, 0];
-    const order = [...Array(9).keys()].map(c => [c, counts[c] + r() * .5]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
-    let ok = true;
-    for (const c of order) {
-      const rows = [0, 1, 2].filter(x => rc[x] < 5).map(x => [x, rc[x] + r() * .9]).sort((a, b) => a[1] - b[1]).map(x => x[0]);
-      if (rows.length < counts[c]) { ok = false; break; }
-      rows.slice(0, counts[c]).forEach(x => { used[x][c] = true; rc[x]++; });
-    }
-    if (!ok || rc.some(v => v !== 5)) continue;
-    const t = [[], [], []].map(() => Array(9).fill(0));
-    for (let c = 0; c < 9; c++) {
-      const lo = c === 0 ? 1 : c * 10, hi = c === 8 ? 90 : c * 10 + 9, pool = [];
-      for (let n = lo; n <= hi; n++) pool.push(n);
-      const chosen = [];
-      for (let k = 0; k < counts[c]; k++) chosen.push(pool.splice((r() * pool.length) | 0, 1)[0]);
-      chosen.sort((a, b) => a - b);
-      let j = 0; for (let x = 0; x < 3; x++) if (used[x][c]) t[x][c] = chosen[j++];
-    }
-    return t;
-  }
-  return null;
-}
-function ticketHTML(t, id, calledSet) {
-  return `<div class="ticket"><div class="th"><span>InstaVeritas Diwali Tambola</span><span>Set ${S.setCode}, <span class="tn">ticket ${id}</span></span></div>
-    <div class="tgrid">${t.flat().map(n => n ? `<span class="${calledSet ? (calledSet.has(n) ? 'hit' : 'miss') : ''}">${n}</span>` : '<span class="e"></span>').join('')}</div></div>`;
-}
-function renderTickets() {
-  $('#setCode').textContent = S.setCode;
-  $('#tkCount').value = String(S.tkCount);
-  let h = ''; for (let i = 1; i <= S.tkCount; i++) h += ticketHTML(makeTicket(S.setCode, i), i);
-  $('#tkPreview').innerHTML = h;
-}
-$('#tkCount').addEventListener('change', e => { S.tkCount = +e.target.value; save(); renderTickets(); });
-twoTap($('#newSet'), 'Tap again: old tickets stop matching', () => { S.setCode = newCode(); save(); renderTickets(); toast(`New ticket set ${S.setCode}`); });
-$('#printBtn').addEventListener('click', () => {
-  $('#printSheet').innerHTML = `<div class="tickets">${$('#tkPreview').innerHTML}</div>`;
-  try { window.print(); } catch (e) { toast('Printing is blocked here. Open the page in its own tab to print.'); }
-});
-
 /* ---------- checking claims ---------- */
-function checkTicket() {
-  const id = parseInt($('#ckId').value, 10), out = $('#ckTicketResult');
-  if (!id || id < 1 || id > 999) { out.innerHTML = '<p class="verdict bad">Enter a ticket number from 1 to 999.</p>'; return; }
-  const t = makeTicket(S.setCode, id), set = new Set(S.called);
-  const rows = t.map(r => r.filter(Boolean)), all = rows.flat(), hits = all.filter(n => set.has(n)).length;
-  const corners = [rows[0][0], rows[0][4], rows[2][0], rows[2][4]];
-  const res = { early: hits >= 5, top: rows[0].every(n => set.has(n)), middle: rows[1].every(n => set.has(n)), bottom: rows[2].every(n => set.has(n)), corners: corners.every(n => set.has(n)), full: hits === 15 };
-  out.innerHTML = ticketHTML(t, id, set) +
-    `<div class="badges">${PRIZES.map(([k, nm]) => `<span class="badge ${res[k] ? 'yes' : ''}">${res[k] ? '✓' : '✗'} ${nm}</span>`).join('')}</div>
-     <p class="verdict ${hits ? 'good' : 'bad'}">${hits} of 15 numbers called on this ticket.</p>`;
-}
-$('#ckGo').addEventListener('click', checkTicket);
-$('#ckId').addEventListener('keydown', e => { if (e.key === 'Enter') checkTicket(); });
 $('#ckNumsGo').addEventListener('click', () => {
   const nums = [...new Set(($('#ckNums').value.match(/\d+/g) || []).map(Number).filter(n => n >= 1 && n <= 90))];
   const out = $('#ckNumsResult');
@@ -609,12 +606,178 @@ $$('[data-tab]').forEach(b => b.addEventListener('click', () => {
 /* ---------- modals ---------- */
 function openModal(id) { $('#' + id).hidden = false; const f = $('#' + id + ' [data-close]'); f && f.focus(); }
 function closeModals() { $$('.modal').forEach(m => m.hidden = true); }
-$('#openTickets').addEventListener('click', () => { renderTickets(); openModal('ticketsModal'); });
 $('#openCheck').addEventListener('click', () => { renderHistory(); openModal('checkModal'); });
 $$('[data-close]').forEach(b => b.addEventListener('click', closeModals));
 $$('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m) closeModals(); }));
 
+/* ---------- prizes: pending list below the board, full list in the Prizes window ---------- */
+const esc = v => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const fmt = n => '₹' + Math.round(+n || 0).toLocaleString('en-IN');
+const namesOf = w => String(w || '').split(/\s*(?:,|&|\+|\band\b)\s*/i).map(x => x.trim()).filter(Boolean);
+function fhRank(name) { const m = String(name).toLowerCase().match(/(1st|2nd|3rd|4th|5th|first|second|third)\s*full/); if (!m) return 0; return { '1st': 1, first: 1, '2nd': 2, second: 2, '3rd': 3, third: 3, '4th': 4, '5th': 5 }[m[1]]; }
+function lockedBy(p, list) {
+  const r = fhRank(p.name); if (r < 2) return null;
+  const prev = list.find(q => fhRank(q.name) === r - 1);
+  return prev && !prev.at ? prev : null;
+}
+function resetWinners(list) { list.forEach(p => { p.winners = ''; p.at = 0; p.draft = ''; }); }
+const totals = list => ({ all: list.reduce((a, p) => a + (+p.amount || 0), 0), won: list.filter(p => p.at).reduce((a, p) => a + (+p.amount || 0), 0), n: list.length, nw: list.filter(p => p.at).length });
+
+function renderPending() {
+  const pend = S.prizes.filter(p => !p.at), t = totals(S.prizes);
+  $('#pendSum').innerHTML = pend.length ? `<b>${pend.length}</b> of ${t.n} prizes left` : '';
+  if (!pend.length) { $('#pendList').innerHTML = '<p class="all-done">Every prize has a winner! 🎉 Open “See all winners” for the full list.</p>'; return; }
+  $('#pendList').innerHTML = pend.map(p => {
+    const lock = lockedBy(p, S.prizes), txt = lock ? `Opens once ${lock.name} has a winner` : '';
+    return `<div class="pend ${lock ? 'locked' : ''}" data-id="${p.id}">
+      <div class="pinfo"><span class="pn">${esc(p.name)}</span><span class="pr">${esc(p.rule)}</span></div>
+      <input class="pw" type="text" placeholder="Winner’s name" value="${esc(p.draft)}" aria-label="Winner of ${esc(p.name)}" ${lock ? 'disabled' : ''}>
+      <button class="btn on award" type="button" ${lock ? 'disabled' : ''}>Award 🎉</button>
+      <p class="pv">${esc(txt)}</p>
+    </div>`;
+  }).join('');
+  $$('.pend').forEach(row => {
+    const p = S.prizes.find(q => q.id === row.dataset.id), w = $('.pw', row);
+    w.addEventListener('input', () => { p.draft = w.value; w.classList.remove('need'); save(); });
+    w.addEventListener('keydown', e => { if (e.key === 'Enter') award(p, row); });
+    $('.award', row).addEventListener('click', () => award(p, row));
+  });
+}
+function award(p, row) {
+  const names = namesOf(p.draft);
+  if (!names.length) { const w = $('.pw', row); w.classList.remove('need'); void w.offsetWidth; w.classList.add('need'); w.focus(); toast('Type the winner’s name first'); return; }
+  p.winners = names.join(', '); p.at = Date.now(); p.draft = ''; save();
+  row.classList.add('leaving');
+  setTimeout(() => { renderPending(); if (!$('#prizesModal').hidden) renderRecord(); }, reduced ? 0 : 420);
+  celebrate();
+  toast(`${p.name} goes to ${p.winners}! 🎉`);
+  say(`${p.name.replace('/', 'or')} goes to ${names.join(' and ')}! Congratulations!`);
+}
+
+/* records: the live game plus every game saved by New game */
+function archiveLive() {
+  if (!S.called.length && !S.prizes.some(p => p.at)) return false;
+  S.archive.unshift({ id: 'g' + Date.now().toString(36), at: Date.now(), setCode: S.setCode, called: S.called.slice(), prizes: JSON.parse(JSON.stringify(S.prizes)) });
+  S.archive = S.archive.slice(0, 25);
+  return true;
+}
+let recId = 'live', editingList = false, editRow = '';
+const recOf = id => id === 'live' ? { live: true, prizes: S.prizes, called: S.called } : S.archive.find(r => r.id === id);
+const when = ts => new Date(ts).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+function renderRecSelect() {
+  if (recId !== 'live' && !recOf(recId)) recId = 'live';
+  $('#recSel').innerHTML = `<option value="live">This game (live)</option>` + S.archive.map((r, i) => { const t = totals(r.prizes); return `<option value="${r.id}">Saved game ${S.archive.length - i}, ${when(r.at)} (${t.nw} of ${t.n} won)</option>`; }).join('');
+  $('#recSel').value = recId;
+}
+function renderRecord() {
+  renderRecSelect();
+  const rec = recOf(recId), list = rec.prizes, t = totals(list);
+  $('#recTotal').innerHTML = `<b>${t.nw}</b> of ${t.n} prizes won`;
+  let rows = '';
+  if (editingList && rec.live) {
+    rows = `<thead><tr><th>Prize</th><th>Rule</th><th>Amount (₹)</th><th></th></tr></thead><tbody>` + list.map(p => `
+      <tr data-id="${p.id}"><td><input data-f="name" value="${esc(p.name)}" aria-label="Prize name"></td><td><input data-f="rule" value="${esc(p.rule)}" aria-label="Rule"></td>
+      <td style="width:140px"><input data-f="amount" type="number" min="0" step="100" value="${esc(p.amount)}" aria-label="Amount"></td>
+      <td class="acts"><button class="btn warn" type="button" data-del>Remove</button></td></tr>`).join('') + `</tbody>`;
+  } else {
+    rows = `<thead><tr><th>Prize</th><th>Amount</th><th>Winner(s)</th><th></th></tr></thead><tbody>` + list.map(p => {
+      const names = namesOf(p.winners), lock = rec.live && !p.at ? lockedBy(p, list) : null;
+      if (editRow === p.id) return `<tr data-id="${p.id}" class="${p.at ? 'won' : ''}"><td><b>${esc(p.name)}</b><span class="rule">${esc(p.rule)}</span></td><td class="amt">${fmt(p.amount)}</td>
+        <td><input data-e="winners" value="${esc(p.winners)}" placeholder="Winner’s name (use commas to split a prize)"></td>
+        <td class="acts"><button class="btn on" type="button" data-save>Save</button><button class="btn" type="button" data-cancel>Cancel</button></td></tr>`;
+      return `<tr data-id="${p.id}" class="${p.at ? 'won' : ''}"><td><b>${esc(p.name)}</b><span class="rule">${esc(p.rule)}</span></td><td class="amt">${fmt(p.amount)}</td>
+        <td>${p.at ? `<span class="wn">${esc(p.winners)}</span>${names.length > 1 ? `<span class="each">${fmt(p.amount / names.length)} each</span>` : ''}` : `<span class="none">${lock ? 'Opens after ' + esc(lock.name) : 'Not won yet'}</span>`}</td>
+        <td class="acts"><button class="btn" type="button" data-edit>${p.at ? '✏️ Edit' : 'Add winner'}</button>${p.at && rec.live ? '<button class="btn" type="button" data-return>↩ Back to list</button>' : ''}</td></tr>`;
+    }).join('') + `</tbody>`;
+  }
+  $('#ptable').innerHTML = rows;
+  wireTable(rec);
+  renderActions(rec);
+}
+function wireTable(rec) {
+  const after = () => { save(); renderPending(); renderRecord(); };
+  $$('#ptable tbody tr').forEach(tr => {
+    const p = rec.prizes.find(q => q.id === tr.dataset.id); if (!p) return;
+    $$('input[data-f]', tr).forEach(inp => inp.addEventListener('change', () => { const f = inp.dataset.f; p[f] = f === 'amount' ? Math.max(0, +inp.value || 0) : inp.value.trim(); save(); renderPending(); const t = totals(rec.prizes); $('#recTotal').innerHTML = `<b>${t.nw}</b> of ${t.n} prizes won`; }));
+    const del = $('[data-del]', tr); if (del) twoTapEl(del, 'Sure?', () => { rec.prizes.splice(rec.prizes.indexOf(p), 1); after(); });
+    const ed = $('[data-edit]', tr); if (ed) ed.addEventListener('click', () => { editRow = p.id; renderRecord(); const i = $('#ptable input[data-e="winners"]'); i && i.focus(); });
+    const cancel = $('[data-cancel]', tr); if (cancel) cancel.addEventListener('click', () => { editRow = ''; renderRecord(); });
+    const sv = $('[data-save]', tr);
+    if (sv) {
+      const doSave = () => {
+        const names = namesOf($('input[data-e="winners"]', tr).value);
+        const wasWon = !!p.at;
+        p.winners = names.join(', '); p.at = names.length ? (p.at || Date.now()) : 0; editRow = '';
+        if (names.length && !wasWon && rec.live) { celebrate(); toast(`${p.name}: ${fmt(p.amount)} to ${p.winners} 🎉`); }
+        else toast(names.length ? 'Saved' : `${p.name} is back on the list`);
+        after();
+      };
+      sv.addEventListener('click', doSave);
+      $$('input[data-e]', tr).forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') doSave(); if (e.key === 'Escape') { e.stopPropagation(); editRow = ''; renderRecord(); } }));
+    }
+    const ret = $('[data-return]', tr);
+    if (ret) ret.addEventListener('click', () => { p.draft = p.winners; p.winners = ''; p.at = 0; toast(`${p.name} is back on the list, name kept for editing`); after(); });
+  });
+}
+function renderActions(rec) {
+  const box = $('#recActions'); $('#copyArea').innerHTML = '';
+  if (rec.live) {
+    box.innerHTML = `<button class="btn ${editingList ? 'on' : ''}" type="button" id="editList">${editingList ? '✓ Done editing' : '✏️ Edit prize list'}</button>
+      ${editingList ? '<button class="btn" type="button" id="addPrize">＋ Add a prize</button><button class="btn warn" type="button" id="resetSheet">Restore the original sheet</button>' : ''}
+      <button class="btn" type="button" id="copyWA">📋 Copy for WhatsApp</button><button class="btn" type="button" id="csvBtn">⬇️ Download Excel (CSV)</button>`;
+    $('#editList').addEventListener('click', () => { editingList = !editingList; editRow = ''; renderRecord(); });
+    if (editingList) {
+      $('#addPrize').addEventListener('click', () => { S.prizes.push({ id: 'p' + Date.now().toString(36), name: 'New prize', rule: '', amount: 1000, winners: '', at: 0, draft: '' }); save(); renderPending(); renderRecord(); const ins = $$('#ptable input[data-f="name"]'); ins[ins.length - 1].select(); });
+      twoTapEl($('#resetSheet'), 'Tap again: winners are cleared', () => { S.prizes = freshPrizes(); save(); renderPending(); renderRecord(); toast('Prize list restored from the sheet'); });
+    }
+  } else {
+    box.innerHTML = `<button class="btn on" type="button" id="restoreRec">↺ Bring this game back to the board</button>
+      <button class="btn" type="button" id="copyWA">📋 Copy for WhatsApp</button><button class="btn" type="button" id="csvBtn">⬇️ Download Excel (CSV)</button>
+      <button class="btn warn" type="button" id="delRec">Delete this record</button>`;
+    twoTapEl($('#restoreRec'), 'Tap again: current game gets saved first', () => {
+      stopAuto(); archiveLive(); const r = S.archive.find(x => x.id === rec.id);
+      S.called = r.called.slice(); S.prizes = JSON.parse(JSON.stringify(r.prizes)); S.setCode = r.setCode || S.setCode;
+      S.archive = S.archive.filter(x => x !== r); recId = 'live'; save(); paint(); renderPending(); renderRecord(); toast('That game is back on the board');
+    });
+    twoTapEl($('#delRec'), 'Tap again to delete for good', () => { S.archive = S.archive.filter(x => x.id !== rec.id); recId = 'live'; save(); renderRecord(); toast('Record deleted'); });
+  }
+  $('#copyWA').addEventListener('click', () => copyWA(rec));
+  $('#csvBtn').addEventListener('click', () => downloadCSV(rec));
+}
+function waText(rec) {
+  const t = totals(rec.prizes);
+  return `🪔 InstaVeritas Diwali Tambola winners 🎉\n\n` + rec.prizes.map(p => `🏆 ${p.name} (${fmt(p.amount)}): ${p.at ? p.winners + (namesOf(p.winners).length > 1 ? ` (${fmt(p.amount / namesOf(p.winners).length)} each)` : '') : 'not won yet'}`).join('\n') +
+    `\n\nHappy Diwali! ✨`;
+}
+function copyWA(rec) {
+  const txt = waText(rec);
+  const fallback = () => { $('#copyArea').innerHTML = `<p class="lead" style="margin-top:12px">Copying is blocked here, so select this text and copy it yourself:</p><textarea class="copybox" readonly>${esc(txt)}</textarea>`; const ta = $('#copyArea textarea'); ta.focus(); ta.select(); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => toast('Winners list copied. Paste it in WhatsApp!'), fallback); else fallback();
+}
+function downloadCSV(rec) {
+  const q = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
+  const lines = [['Prize combination', 'Rule', 'Prize Amount', 'Winners', 'Awarded at'].map(q).join(',')]
+    .concat(rec.prizes.map(p => [p.name, p.rule, p.amount, p.winners, p.at ? new Date(p.at).toLocaleString('en-IN') : ''].map(q).join(',')));
+  try {
+    const url = URL.createObjectURL(new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' }));
+    const a = document.createElement('a'); a.href = url; a.download = `Tambola winners ${new Date().toLocaleDateString('en-IN').replace(/\//g, '-')}.csv`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+    toast('Downloading the winners sheet. If nothing happens, open the page on your website to download.');
+  } catch (e) { toast('Downloads are blocked here. Use Copy for WhatsApp instead.'); }
+}
+function twoTapEl(btn, label, action) {
+  let armed = false, t = 0; const orig = btn.textContent;
+  btn.addEventListener('click', () => {
+    if (!armed) { armed = true; btn.classList.add('armed'); btn.textContent = label; t = setTimeout(() => { armed = false; btn.classList.remove('armed'); btn.textContent = orig; }, 3500); return; }
+    clearTimeout(t); action();
+  });
+}
+$('#recSel').addEventListener('change', e => { recId = e.target.value; editingList = false; editRow = ''; renderRecord(); });
+const openPrizes = () => { recId = 'live'; editingList = false; editRow = ''; renderRecord(); openModal('prizesModal'); };
+$('#openPrizes2').addEventListener('click', openPrizes);
+
 /* ---------- go ---------- */
+renderPending();
 paint();
 })();
 </script>
